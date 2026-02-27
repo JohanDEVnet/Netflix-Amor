@@ -1,6 +1,6 @@
 # Netflix-Amor
 
-Una página web que recrea la experiencia visual de Netflix, pero con un propósito diferente: una declaración de amor. Sin librerías, sin frameworks. Solo HTML, CSS y JavaScript puro.
+Una página web que recrea la experiencia visual de Netflix, pero con un propósito diferente: una declaración de amor para tu pareja. Sin librerías, sin frameworks. Solo HTML, CSS y JavaScript puro.
 
 ---
 
