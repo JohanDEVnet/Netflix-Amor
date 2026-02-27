@@ -1,0 +1,914 @@
+/* ===================================================================
+   RESET & TOKENS
+=================================================================== */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --black: #000000;
+    --bg: #141414;
+    --bg2: #1a1a1a;
+    --red: #E50914;
+    --red-dark: #8B0000;
+    --white: #ffffff;
+    --gray: #a0a0a0;
+    --card: #1e1e1e;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--white);
+    overflow-x: hidden;
+}
+
+/* ===================================================================
+   INTRO — FASE 1: N SVG
+=================================================================== */
+.intro-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    overflow: hidden;
+    transition: opacity 0.8s ease;
+}
+
+.intro-screen.out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ---- N wrapper ---- */
+.n-wrap {
+    position: relative;
+    z-index: 10;
+    /* Fase 1: aparece limpiamente */
+    animation: nAppear 0.45s 0.05s ease-out forwards,
+        nZoom 0.65s 1.30s cubic-bezier(0.6, 0, 0.9, 0.5) forwards;
+    opacity: 0;
+}
+
+#n-svg {
+    width: 100px;
+    height: auto;
+    filter: drop-shadow(0 0 24px #E50914) drop-shadow(0 0 60px rgba(229, 9, 20, 0.4));
+}
+
+/* Las 3 partes de la N se dibujan en secuencia con scaleY */
+.nb {
+    transform-box: fill-box;
+}
+
+/* Barra izquierda: de abajo hacia arriba */
+.nb-left {
+    transform: scaleY(0);
+    transform-origin: 50% 100%;
+    animation: barUp 0.38s 0.05s ease-out forwards;
+}
+
+/* Diagonal: aparece al mismo tiempo */
+.nb-diag {
+    opacity: 0;
+    animation: fadeIn 0.3s 0.10s ease-out forwards;
+}
+
+/* Barra derecha: de arriba hacia abajo */
+.nb-right {
+    transform: scaleY(0);
+    transform-origin: 50% 0%;
+    animation: barDown 0.38s 0.22s ease-out forwards;
+}
+
+@keyframes barUp {
+    to {
+        transform: scaleY(1);
+    }
+}
+
+@keyframes barDown {
+    to {
+        transform: scaleY(1);
+    }
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Fase 1: N aparece */
+@keyframes nAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.88);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Fase 2: N zoom brutal → pantalla llena */
+@keyframes nZoom {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+
+    55% {
+        opacity: 1;
+        transform: scale(6);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(28);
+        filter: blur(5px);
+    }
+}
+
+/* ===================================================================
+   INTRO — FASE 2: Spectrum secuencial
+   Las barras de color las genera script.js una por una.
+   Este div es solo el contenedor (display:none por defecto).
+=================================================================== */
+.spectrum {
+    display: none;
+    /* JS lo activa y construye las barras */
+}
+
+/* ===================================================================
+   APP PRINCIPAL
+=================================================================== */
+.app-hidden {
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.app-hidden.app-visible {
+    opacity: 1;
+}
+
+/* ===================================================================
+   NAVBAR
+=================================================================== */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 18px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
+}
+
+.logo {
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: -2px;
+    color: var(--red);
+    user-select: none;
+}
+
+.logo span {
+    color: var(--white);
+}
+
+/* ===================================================================
+   HERO
+=================================================================== */
+.hero {
+    position: relative;
+    height: 100vh;
+    min-height: 600px;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 60px 90px;
+    overflow: hidden;
+}
+
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+        url('https://images.unsplash.com/photo-1494774157365-9e04c6720e47?q=80&w=2670&auto=format&fit=crop') center/cover no-repeat;
+    transform: scale(1.04);
+    transition: transform 8s ease;
+}
+
+.hero:hover .hero-bg {
+    transform: scale(1);
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(to right, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.5) 60%, transparent 100%),
+        linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 55%);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 580px;
+}
+
+.hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 16px;
+}
+
+.hero-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(1.3);
+    }
+}
+
+.hero-title {
+    font-size: clamp(2.8rem, 5.5vw, 5rem);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+}
+
+.hero-meta {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+}
+
+.hero-synopsis {
+    font-size: 1.1rem;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.82);
+    margin-bottom: 32px;
+    max-width: 460px;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 13px 32px;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.15s ease;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.3px;
+}
+
+.btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+.btn-play {
+    background: var(--white);
+    color: var(--black);
+}
+
+.btn-play:hover {
+    background: rgba(255, 255, 255, 0.82);
+}
+
+.btn-info {
+    background: rgba(109, 109, 110, 0.65);
+    color: var(--white);
+}
+
+.btn-info:hover {
+    background: rgba(109, 109, 110, 0.4);
+}
+
+/* Rating badge (esquina superior derecha del hero) */
+.hero-rating {
+    position: absolute;
+    top: 50%;
+    right: 60px;
+    transform: translateY(-50%);
+    text-align: center;
+    z-index: 3;
+}
+
+.rating-score {
+    display: block;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1;
+}
+
+.rating-pct {
+    font-size: 1.8rem;
+}
+
+.rating-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    display: block;
+    margin-top: 4px;
+}
+
+/* ===================================================================
+   SECCIONES — Layout base
+=================================================================== */
+.section {
+    padding: 40px 0 60px;
+    position: relative;
+}
+
+.section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 0 60px;
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+.section-sub {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--red);
+    letter-spacing: 1px;
+}
+
+/* ===================================================================
+   EPISODIOS — Carrusel cinemático con overlay
+=================================================================== */
+.episodes-section {
+    margin-top: -60px;
+    z-index: 10;
+}
+
+.ep-track {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    padding: 0 60px 20px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.ep-track::-webkit-scrollbar {
+    display: none;
+}
+
+.ep-card {
+    position: relative;
+    flex: 0 0 320px;
+    height: 200px;
+    cursor: pointer;
+    overflow: hidden;
+    /* Sin border-radius para look cinemático de película */
+    border-right: 2px solid var(--bg);
+}
+
+.ep-card:first-child {
+    border-radius: 8px 0 0 8px;
+}
+
+.ep-card:last-child {
+    border-radius: 0 8px 8px 0;
+    border-right: none;
+}
+
+/* Thumbnail */
+.ep-thumb {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.5s ease;
+}
+
+.ep-card:hover .ep-thumb {
+    transform: scale(1.08);
+}
+
+/* Overlay oscuro permanente + más oscuro al hover */
+.ep-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,
+            rgba(0, 0, 0, 0.92) 0%,
+            rgba(0, 0, 0, 0.4) 50%,
+            rgba(0, 0, 0, 0.15) 100%);
+    transition: background 0.35s ease;
+}
+
+.ep-card:hover .ep-overlay {
+    background: linear-gradient(to top,
+            rgba(0, 0, 0, 0.96) 0%,
+            rgba(0, 0, 0, 0.6) 50%,
+            rgba(0, 0, 0, 0.3) 100%);
+}
+
+/* Metadata sobre la imagen */
+.ep-meta {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 18px;
+    z-index: 2;
+    transition: transform 0.35s ease;
+}
+
+.ep-card:hover .ep-meta {
+    transform: translateY(-4px);
+}
+
+.ep-num {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.ep-name {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.ep-dur {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 1px;
+}
+
+/* Botón play (aparece en hover) */
+.ep-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.6);
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 3;
+    backdrop-filter: blur(4px);
+}
+
+.ep-play-btn svg {
+    width: 18px;
+    height: 18px;
+    margin-left: 3px;
+}
+
+.ep-card:hover .ep-play-btn {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* ===================================================================
+   PILARES DE NOSOTROS — Sección romántica premium
+=================================================================== */
+.pillars-section {
+    padding: 40px 0 80px;
+}
+
+.pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
+    gap: 16px;
+    padding: 0 60px;
+}
+
+.pillar-card {
+    background: var(--card);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.pillar-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(229, 9, 20, 0.06) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.pillar-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(229, 9, 20, 0.25);
+}
+
+.pillar-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid rgba(229, 9, 20, 0.3);
+    background: rgba(229, 9, 20, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.3s, background 0.3s;
+}
+
+.pillar-card:hover .pillar-icon {
+    border-color: rgba(229, 9, 20, 0.6);
+    background: rgba(229, 9, 20, 0.14);
+}
+
+.pillar-icon svg {
+    width: 20px;
+    height: 20px;
+    color: #E50914;
+}
+
+.pillar-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+}
+
+.pillar-card p {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+    flex: 1;
+}
+
+/* Barra de intensidad */
+.pillar-bar-wrap {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.pillar-bar {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--red-dark), var(--red));
+    border-radius: 2px;
+    transition: width 1.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Card de cita — ocupa toda la fila inferior */
+.pillar-quote {
+    grid-column: 1 / -1;
+    background: transparent;
+    border: 1px solid rgba(229, 9, 20, 0.2);
+    padding: 32px 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+.pillar-quote::before {
+    background: linear-gradient(135deg, rgba(229, 9, 20, 0.08) 0%, transparent 50%);
+}
+
+.pillar-quote blockquote {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.7;
+    text-align: center;
+    letter-spacing: 0.2px;
+}
+
+.pillar-quote blockquote::before {
+    content: '"';
+    font-size: 4rem;
+    color: var(--red);
+    line-height: 0;
+    vertical-align: -1.4rem;
+    margin-right: 4px;
+    font-style: normal;
+}
+
+/* ===================================================================
+   MODAL DE EPISODIO
+=================================================================== */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+}
+
+.modal.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-box {
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 12px;
+    padding: 40px;
+    max-width: 540px;
+    width: 90%;
+    position: relative;
+    transform: translateY(28px) scale(0.97);
+    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+}
+
+.modal.open .modal-box {
+    transform: translateY(0) scale(1);
+}
+
+.modal-close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    background: none;
+    border: none;
+    font-size: 1.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: var(--white);
+    transform: scale(1.2);
+}
+
+.modal-ep-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 10px;
+}
+
+.modal-box h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+}
+
+.modal-dur {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+}
+
+.modal-box #modal-desc {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* ===================================================================
+   FOOTER
+=================================================================== */
+.footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 0.5px;
+}
+
+/* ===================================================================
+   RESPONSIVE — Mobile
+=================================================================== */
+@media (max-width: 900px) {
+    .navbar {
+        padding: 16px 24px;
+    }
+
+    .hero {
+        padding: 0 24px 80px;
+    }
+
+    .hero-rating {
+        right: 24px;
+    }
+
+    .rating-score {
+        font-size: 2.4rem;
+    }
+
+    .section-header {
+        padding: 0 24px;
+    }
+
+    .ep-track {
+        padding: 0 24px 20px;
+    }
+
+    .ep-card {
+        flex: 0 0 260px;
+        height: 170px;
+    }
+
+    .pillars-grid {
+        grid-template-columns: 1fr 1fr;
+        padding: 0 24px;
+    }
+
+    .pillar-quote {
+        grid-column: 1 / -1;
+        padding: 24px;
+    }
+}
+
+@media (max-width: 560px) {
+    .hero-title {
+        letter-spacing: -1px;
+    }
+
+    .hero-rating {
+        display: none;
+    }
+
+    .ep-card {
+        flex: 0 0 220px;
+        height: 150px;
+    }
+
+    .ep-name {
+        font-size: 0.9rem;
+    }
+
+    .pillars-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===================================================================
+   FOOTER MEJORADO — con crédito de developer
+=================================================================== */
+.footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 32px 60px 28px;
+    margin-top: 20px;
+}
+
+.footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.footer-copy {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 0.5px;
+}
+
+.footer-divider {
+    width: 40px;
+    height: 1px;
+    background: rgba(229, 9, 20, 0.35);
+    border-radius: 1px;
+}
+
+.footer-dev {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.footer-dev-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.25);
+    font-weight: 500;
+}
+
+.footer-dev-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: color 0.2s ease;
+}
+
+.footer-dev-name:hover {
+    color: var(--white);
+}
+
+.footer-dev-name svg {
+    width: 15px;
+    height: 15px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.footer-dev-name:hover svg {
+    opacity: 1;
+}
+
+@media (max-width: 900px) {
+    .footer {
+        padding: 24px;
+    }
+}
